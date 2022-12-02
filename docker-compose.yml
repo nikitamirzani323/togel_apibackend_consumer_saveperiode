@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  toto-consumer-agen-saveperiode:
+    container_name: toto-consumer-agen-saveperiode
+    image: toto-consumer-agen-saveperiode:0.0.1
+    build: .
+    restart: always
