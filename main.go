@@ -94,9 +94,7 @@ func main() {
 				// log.Println(string(Company))
 				flag := false
 				tbl_trx_keluarantogel, tbl_trx_keluarantogel_detail, tbl_trx_keluarantogel_member := models.Get_mappingdatabase(string(Company))
-				// log.Println(string(Idtrxkeluaran))
-				// log.Println(string(Company))
-				// log.Println(tbl_trx_keluarantogel)
+
 				flag = models.CheckDBTwoField(tbl_trx_keluarantogel, "idtrxkeluaran", string(Idtrxkeluaran), "idcompany", string(Company))
 				flag_next := true
 				idinvoice, _ := strconv.Atoi(string(Idtrxkeluaran))
@@ -167,6 +165,8 @@ func main() {
 					wg.Wait()
 					log.Println("TIME JOBS: ", time.Since(render_page).String())
 					log.Println("FLAGS: ", flag)
+					noinvoice, _ := strconv.Atoi(string(Idtrxkeluaran))
+					_deleteredis_generator(string(Company), noinvoice)
 				}
 				if flag_next {
 					sql_detailbetwinner := `SELECT
@@ -275,7 +275,7 @@ func main() {
 					}
 					defer row_detailbetwinner.Close()
 
-					log.Printf("TOTAL BET: %d - TOTAL BAYAR: %d - TOTAL WIN: %d - TOTAL MEMBER:%d - TOTAL CANCEL:%d", totalbet, totalbayar, totalwin, totalmembertogel, totalcancel)
+					fmt.Printf("TOTAL BET: %d - TOTAL BAYAR: %d - TOTAL WIN: %d - TOTAL MEMBER:%d - TOTAL CANCEL:%d", totalbet, totalbayar, totalwin, totalmembertogel, totalcancel)
 					if totalbet > 0 {
 						//UPDATE DETAIL KELUARAN
 						sql_update := `
@@ -390,11 +390,11 @@ func _doJobUpdateTransaksi(fieldtable string, jobs <-chan datajobs, results chan
 				}()
 
 				sql_update := `
-				UPDATE 
-				` + fieldtable + `      
-				SET statuskeluarandetail=? , 
-				updatekeluarandetail=?, updatedatekeluarandetail=? 
-				WHERE idtrxkeluarandetail=?  AND idtrxkeluaran=? 
+					UPDATE 
+					` + fieldtable + `      
+					SET statuskeluarandetail=? , 
+					updatekeluarandetail=?, updatedatekeluarandetail=? 
+					WHERE idtrxkeluarandetail=?  AND idtrxkeluaran=? 
 				`
 				flag_update, msg_update := models.Exec_SQL(sql_update, fieldtable, "UPDATE",
 					capture.Statuskeluarandetail,

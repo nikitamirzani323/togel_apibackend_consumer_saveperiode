@@ -92,7 +92,6 @@ func CheckDBTwoField(table, field_1, value_1, field_2, value_2 string) bool {
 					WHERE ` + field_1 + ` = ? 
 					AND ` + field_2 + ` = ? 
 				`
-	log.Println(sql_db)
 	row := con.QueryRowContext(ctx, sql_db, value_1, value_2)
 	switch e := row.Scan(&field_1); e {
 	case sql.ErrNoRows:
