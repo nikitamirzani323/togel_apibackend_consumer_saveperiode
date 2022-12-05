@@ -7,10 +7,49 @@ import (
 	"strings"
 	s "strings"
 
+	"github.com/nikitamirzani323/togel_apibackend_consumer_saveperiode/config"
 	"github.com/nikitamirzani323/togel_apibackend_consumer_saveperiode/db"
 	"github.com/nikitamirzani323/togel_apibackend_consumer_saveperiode/helpers"
 )
 
+func Get_counter(field_column string) int {
+	con := db.CreateCon()
+	ctx := context.Background()
+	idrecord_counter := 0
+
+	sqlcounter := `SELECT 
+					counter 
+					FROM ` + config.DB_tbl_counter + ` 
+					WHERE nmcounter = ? 
+				`
+	var counter int = 0
+	row := con.QueryRowContext(ctx, sqlcounter, field_column)
+	switch e := row.Scan(&counter); e {
+	case sql.ErrNoRows:
+		log.Println("No rows were returned!")
+	case nil:
+		// log.Println(counter)
+	default:
+		panic(e)
+	}
+	if counter > 0 {
+		idrecord_counter = int(counter) + 1
+		sql_update := `UPDATE ` + config.DB_tbl_counter + ` SET counter=? WHERE nmcounter=? `
+		flag_update, msg_update := Exec_SQL(sql_update, config.DB_tbl_counter, "UPDATE", idrecord_counter, field_column)
+		if !flag_update {
+			log.Println(msg_update)
+		}
+	} else {
+		idrecord_counter = 1
+		sql_insert := `insert into ` + config.DB_tbl_counter + ` (nmcounter, counter) values (?, ?) `
+		flag_insert, msg_insert := Exec_SQL(sql_insert, config.DB_tbl_counter, "INSERT", field_column, idrecord_counter)
+		if !flag_insert {
+			log.Println(msg_insert)
+		}
+
+	}
+	return idrecord_counter
+}
 func Get_listitemsearch(data, pemisah, search string) bool {
 	flag := false
 	temp := s.Split(data, pemisah)
