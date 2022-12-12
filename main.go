@@ -654,7 +654,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 	var result string = "LOSE"
 	var win float32 = 0
 
-	_, tbl_trx_keluarantogel_detail, _ := models.Get_mappingdatabase(company)
+	_, tbl_trx_keluarantogel_detail, _ := Get_mappingdatabase(company)
 
 	temp := angka
 	temp4d := string([]byte(temp)[0]) + string([]byte(temp)[1]) + string([]byte(temp)[2]) + string([]byte(temp)[3])
@@ -682,17 +682,16 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 					for b, _ := range temp4d {
 						for c, _ := range temp4d {
 							for d, _ := range temp4d {
-								temp_loop := string([]byte(temp4d)[a]) + string([]byte(temp4d)[b]) + string([]byte(temp4d)[c]) + string([]byte(temp4d)[d])
-								if len(temp4d_arr) > 0 {
-									for x := 0; x < len(temp4d_arr); x++ {
-										if temp_loop != temp4d_arr[x] {
-											temp4d_arr = append(temp4d_arr, temp_loop)
+								if string([]byte(temp4d)[a]) != string([]byte(temp4d)[b]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[d]) {
+									if string([]byte(temp4d)[b]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[b]) != string([]byte(temp4d)[d]) {
+										if string([]byte(temp4d)[c]) != string([]byte(temp4d)[d]) {
+											temp_loop := string([]byte(temp4d)[a]) + string([]byte(temp4d)[b]) + string([]byte(temp4d)[c]) + string([]byte(temp4d)[d])
+											if temp4d != temp_loop {
+												temp4d_arr = append(temp4d_arr, temp_loop)
+											}
 										}
 									}
-								} else {
-									temp4d_arr = append(temp4d_arr, temp_loop)
 								}
-								temp_loop = ""
 							}
 						}
 					}
@@ -1417,6 +1416,7 @@ func _updatevaluewinbytipe(nmtable string, win float32, idtrxkeluarandetail int)
 		log.Println(msg_update)
 	}
 }
+
 func _tableshio(shiodata string) string {
 	log.Printf("Shio : %s", shiodata)
 
@@ -1710,4 +1710,878 @@ func Pasaran_id(idcomppasaran int, company, tipecolumn string) (string, float32)
 		helpers.ErrorCheck(err)
 	}
 	return result, result_number
+}
+func _rumusTogelold(angka, tipe, nomorkeluaran, posisitogel, company, simpandb string, idcomppasaran, idtrxkeluarandetail int) (string, float32) {
+	tglnow, _ := goment.New()
+	var result string = "LOSE"
+	var win float32 = 0
+
+	_, tbl_trx_keluarantogel_detail, _ := models.Get_mappingdatabase(company)
+
+	temp := angka
+	temp4d := string([]byte(temp)[0]) + string([]byte(temp)[1]) + string([]byte(temp)[2]) + string([]byte(temp)[3])
+	temp3d := string([]byte(temp)[1]) + string([]byte(temp)[2]) + string([]byte(temp)[3])
+	temp3dd := string([]byte(temp)[0]) + string([]byte(temp)[1]) + string([]byte(temp)[2])
+	temp2d := string([]byte(temp)[2]) + string([]byte(temp)[3])
+	temp2dd := string([]byte(temp)[0]) + string([]byte(temp)[1])
+	temp2dt := string([]byte(temp)[1]) + string([]byte(temp)[2])
+
+	var temp4d_arr []string
+	var temp3d_arr []string
+	var temp3dd_arr []string
+	var temp2d_arr []string
+	var temp2dd_arr []string
+	var temp2dt_arr []string
+
+	switch tipe {
+	case "4D":
+		if temp4d == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_4D := false
+				for a, _ := range temp4d {
+					for b, _ := range temp4d {
+						for c, _ := range temp4d {
+							for d, _ := range temp4d {
+								if string([]byte(temp4d)[a]) != string([]byte(temp4d)[b]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[d]) {
+									if string([]byte(temp4d)[b]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[b]) != string([]byte(temp4d)[d]) {
+										if string([]byte(temp4d)[c]) != string([]byte(temp4d)[d]) {
+											temp_loop := string([]byte(temp4d)[a]) + string([]byte(temp4d)[b]) + string([]byte(temp4d)[c]) + string([]byte(temp4d)[d])
+											if temp4d != temp_loop {
+												temp4d_arr = append(temp4d_arr, temp_loop)
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				for a, _ := range temp4d_arr {
+					if temp4d_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_4D = true
+					}
+
+				}
+				if flag_bb_4D {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win4dbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "3D":
+		if temp3d == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_3D := false
+				for a, _ := range temp3d {
+					for b, _ := range temp3d {
+						for c, _ := range temp3d {
+							if string([]byte(temp3d)[a]) != string([]byte(temp3d)[b]) && string([]byte(temp3d)[a]) != string([]byte(temp3d)[c]) {
+								if string([]byte(temp3d)[b]) != string([]byte(temp3d)[c]) {
+									temp_loop := string([]byte(temp3d)[a]) + string([]byte(temp3d)[b]) + string([]byte(temp3d)[c])
+									if temp3d != temp_loop {
+										temp3d_arr = append(temp3d_arr, temp_loop)
+									}
+								}
+							}
+
+						}
+					}
+				}
+				for a, _ := range temp3d_arr {
+					if temp3d_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_3D = true
+					}
+
+				}
+				if flag_bb_3D {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win3dbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "3DD":
+		if temp3dd == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_3DD := false
+				for a, _ := range temp3dd {
+					for b, _ := range temp3dd {
+						for c, _ := range temp3dd {
+							if string([]byte(temp3dd)[a]) != string([]byte(temp3dd)[b]) && string([]byte(temp3dd)[a]) != string([]byte(temp3dd)[c]) {
+								if string([]byte(temp3dd)[b]) != string([]byte(temp3dd)[c]) {
+									temp_loop := string([]byte(temp3dd)[a]) + string([]byte(temp3dd)[b]) + string([]byte(temp3dd)[c])
+									if temp3dd != temp_loop {
+										temp3dd_arr = append(temp3dd_arr, temp_loop)
+									}
+								}
+							}
+
+						}
+					}
+				}
+				for a, _ := range temp3dd_arr {
+					if temp3dd_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_3DD = true
+					}
+
+				}
+				if flag_bb_3DD {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win3ddbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "2D":
+		if temp2d == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_2D := false
+				for a, _ := range temp2d {
+					for b, _ := range temp2d {
+						if string([]byte(temp2d)[a]) != string([]byte(temp2d)[b]) {
+							temp_loop := string([]byte(temp2d)[a]) + string([]byte(temp2d)[b])
+							if temp2d != temp_loop {
+								temp2d_arr = append(temp2d_arr, temp_loop)
+							}
+						}
+					}
+				}
+				for a, _ := range temp2d_arr {
+					if temp2d_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_2D = true
+					}
+
+				}
+				if flag_bb_2D {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win2dbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "2DD":
+		if temp2dd == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_2DD := false
+				for a, _ := range temp2dd {
+					for b, _ := range temp2dd {
+						if string([]byte(temp2dd)[a]) != string([]byte(temp2dd)[b]) {
+							temp_loop := string([]byte(temp2dd)[a]) + string([]byte(temp2dd)[b])
+							if temp2dd != temp_loop {
+								temp2dd_arr = append(temp2dd_arr, temp_loop)
+							}
+						}
+					}
+				}
+				for a, _ := range temp2dd_arr {
+					if temp2dd_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_2DD = true
+					}
+
+				}
+				if flag_bb_2DD {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win2ddbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "2DT":
+		if temp2dt == nomorkeluaran {
+			result = "WINNER"
+		} else {
+			if posisitogel == "BB" {
+				flag_bb_2DT := false
+				for a, _ := range temp2dt {
+					for b, _ := range temp2dt {
+						if string([]byte(temp2dt)[a]) != string([]byte(temp2dt)[b]) {
+							temp_loop := string([]byte(temp2dt)[a]) + string([]byte(temp2dt)[b])
+							if temp2dt != temp_loop {
+								temp2dt_arr = append(temp2dt_arr, temp_loop)
+							}
+						}
+					}
+				}
+				for a, _ := range temp2dt_arr {
+					if temp2dt_arr[a] == nomorkeluaran {
+						result = "WINNER"
+						flag_bb_2DT = true
+					}
+
+				}
+				if flag_bb_2DT {
+					_, win_db := Pasaran_id(idcomppasaran, company, "1_win2dtbb")
+					win = win_db
+					if simpandb == "Y" {
+						sql_update := `
+							UPDATE
+							` + tbl_trx_keluarantogel_detail + `
+							SET win=?,
+							updatekeluarandetail=?, updatedatekeluarandetail=?
+							WHERE idtrxkeluarandetail=?
+						`
+						flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+							win_db,
+							"SYSTEM",
+							tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+							idtrxkeluarandetail)
+						if flag_update {
+							log.Println(msg_update)
+						} else {
+							log.Println(msg_update)
+						}
+					}
+				}
+			}
+		}
+	case "COLOK_BEBAS":
+		flag := false
+		count := 0
+		for i := 0; i < len(temp); i++ {
+			if string([]byte(temp)[i]) == nomorkeluaran {
+				flag = true
+				count = count + 1
+			}
+		}
+		if flag {
+			_, win_db := Pasaran_id(idcomppasaran, company, "2_win")
+			if count == 1 {
+				win = win_db
+			}
+			if count == 2 {
+				win = win_db * 2
+			}
+			if count == 3 {
+				win = win_db * 3
+			}
+			if count == 4 {
+				win = win_db * 3
+			}
+			fmt.Println(win)
+
+			if simpandb == "Y" {
+				//UPDATE WIN DETAIL BET
+				sql_update := `
+					UPDATE
+					` + tbl_trx_keluarantogel_detail + `
+					SET win=?,
+					updatekeluarandetail=?, updatedatekeluarandetail=?
+					WHERE idtrxkeluarandetail=?
+				`
+				flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+					win,
+					"SYSTEM",
+					tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+					idtrxkeluarandetail)
+				if flag_update {
+					log.Println(msg_update)
+				} else {
+					log.Println(msg_update)
+				}
+			}
+			result = "WINNER"
+		}
+	case "COLOK_MACAU":
+		flag_1 := false
+		flag_2 := false
+		count_1 := 0
+		count_2 := 0
+		totalcount := 0
+		var win float32 = 0
+		for i := 0; i < len(temp); i++ {
+			if string([]byte(temp)[i]) == string([]byte(nomorkeluaran)[0]) {
+				flag_1 = true
+				count_1 = count_1 + 1
+			}
+			if string([]byte(temp)[i]) == string([]byte(nomorkeluaran)[1]) {
+				flag_2 = true
+				count_2 = count_2 + 1
+			}
+		}
+		if flag_1 && flag_2 {
+			totalcount = count_1 + count_2
+			if totalcount == 2 {
+				_, win = Pasaran_id(idcomppasaran, company, "3_win2digit")
+			}
+			if totalcount == 3 {
+				_, win = Pasaran_id(idcomppasaran, company, "3_win3digit")
+			}
+			if totalcount == 4 {
+				_, win = Pasaran_id(idcomppasaran, company, "3_win4digit")
+			}
+			if simpandb == "Y" {
+				//UPDATE WIN DETAIL BET
+				sql_update := `
+					UPDATE
+					` + tbl_trx_keluarantogel_detail + `
+					SET win=?,
+					updatekeluarandetail=?, updatedatekeluarandetail=?
+					WHERE idtrxkeluarandetail=?
+				`
+				flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+					win,
+					"SYSTEM",
+					tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+					idtrxkeluarandetail)
+				if flag_update {
+					log.Println(msg_update)
+				} else {
+					log.Println(msg_update)
+				}
+			}
+			result = "WINNER"
+		}
+	case "COLOK_NAGA":
+		flag_1 := false
+		flag_2 := false
+		flag_3 := false
+		count_1 := 0
+		count_2 := 0
+		count_3 := 0
+		totalcount := 0
+		var win float32 = 0
+		for i := 0; i < len(temp); i++ {
+			if string([]byte(temp)[i]) == string([]byte(nomorkeluaran)[0]) {
+				flag_1 = true
+				count_1 = count_1 + 1
+			}
+			if string([]byte(temp)[i]) == string([]byte(nomorkeluaran)[1]) {
+				flag_2 = true
+				count_2 = count_2 + 1
+			}
+			if string([]byte(temp)[i]) == string([]byte(nomorkeluaran)[2]) {
+				flag_3 = true
+				count_3 = count_3 + 1
+			}
+		}
+		if flag_1 && flag_2 {
+			if flag_3 {
+				totalcount = count_1 + count_2 + count_3
+				log.Println("Total Count Colok Naga :", totalcount)
+
+				if totalcount == 3 {
+					_, win = Pasaran_id(idcomppasaran, company, "4_win3digit")
+				}
+				if totalcount == 4 {
+					_, win = Pasaran_id(idcomppasaran, company, "4_win4digit")
+				}
+				log.Println("WIN COLOK NAGA :", win)
+				if simpandb == "Y" {
+					//UPDATE WIN DETAIL BET
+					sql_update := `
+						UPDATE
+						` + tbl_trx_keluarantogel_detail + `
+						SET win=?,
+						updatekeluarandetail=?, updatedatekeluarandetail=?
+						WHERE idtrxkeluarandetail=?
+					`
+					flag_update, msg_update := models.Exec_SQL(sql_update, tbl_trx_keluarantogel_detail, "UPDATE",
+						win,
+						"SYSTEM",
+						tglnow.Format("YYYY-MM-DD HH:mm:ss"),
+						idtrxkeluarandetail)
+					if flag_update {
+						log.Println(msg_update)
+					} else {
+						log.Println(msg_update)
+					}
+				}
+				result = "WINNER"
+			}
+		}
+	case "COLOK_JITU":
+		flag := false
+		as := string([]byte(temp)[0]) + "_AS"
+		kop := string([]byte(temp)[1]) + "_KOP"
+		kepala := string([]byte(temp)[2]) + "_KEPALA"
+		ekor := string([]byte(temp)[3]) + "_EKOR"
+
+		if as == nomorkeluaran {
+			flag = true
+		}
+		if kop == nomorkeluaran {
+			flag = true
+		}
+		if kepala == nomorkeluaran {
+			flag = true
+		}
+		if ekor == nomorkeluaran {
+			flag = true
+		}
+		if flag {
+			result = "WINNER"
+		}
+	case "50_50_UMUM":
+		flag := false
+		data := []string{}
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+		kepala_2, _ := strconv.Atoi(kepala)
+		ekor_2, _ := strconv.Atoi(ekor)
+		dasar, _ := strconv.Atoi(kepala + ekor)
+		//BESARKECIL
+		if kepala_2 <= 4 {
+			data = append(data, "KECIL")
+		} else {
+			data = append(data, "BESAR")
+		}
+		//GENAPGANJIL
+		if ekor_2%2 == 0 {
+			data = append(data, "GENAP")
+		} else {
+			data = append(data, "GANJIL")
+		}
+		log.Printf("DASAR : %d", dasar)
+		//TEPITENGAH
+		if dasar >= 0 && dasar <= 24 {
+			data = append(data, "TEPI")
+		}
+		if dasar >= 25 && dasar <= 74 {
+			data = append(data, "TENGAH")
+		}
+		if dasar >= 75 && dasar <= 99 {
+			data = append(data, "TEPI")
+		}
+		for i := 0; i < len(data); i++ {
+			if data[i] == nomorkeluaran {
+				flag = true
+			}
+		}
+		if flag {
+			result = "WINNER"
+		}
+		fmt.Println(data)
+	case "50_50_SPECIAL":
+		flag := false
+		as := string([]byte(temp)[0])
+		kop := string([]byte(temp)[1])
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+
+		as_2, _ := strconv.Atoi(as)
+		kop_2, _ := strconv.Atoi(kop)
+		kepala_2, _ := strconv.Atoi(kepala)
+		ekor_2, _ := strconv.Atoi(ekor)
+		//AS - BESARKECIL == GENAPGANJIL
+		if as_2 <= 4 {
+			if nomorkeluaran == "AS_KECIL" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "AS_BESAR" {
+				flag = true
+			}
+		}
+		if as_2%2 == 0 {
+			if nomorkeluaran == "AS_GENAP" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "AS_GANJIL" {
+				flag = true
+			}
+		}
+
+		//KOP - BESARKECIL == GENAPGANJIL
+		if kop_2 <= 4 {
+			if nomorkeluaran == "KOP_KECIL" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "KOP_BESAR" {
+				flag = true
+			}
+		}
+		if kop_2%2 == 0 {
+			if nomorkeluaran == "KOP_GENAP" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "KOP_GANJIL" {
+				flag = true
+			}
+		}
+
+		//KEPALA - BESARKECIL == GENAPGANJIL
+		if kepala_2 <= 4 {
+			if nomorkeluaran == "KEPALA_KECIL" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "KEPALA_BESAR" {
+				flag = true
+			}
+		}
+		if kepala_2%2 == 0 {
+			if nomorkeluaran == "KEPALA_GENAP" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "KEPALA_GANJIL" {
+				flag = true
+			}
+		}
+
+		//EKOR - BESARKECIL == GENAPGANJIL
+		if ekor_2 <= 4 {
+			if nomorkeluaran == "EKOR_KECIL" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "EKOR_BESAR" {
+				flag = true
+			}
+		}
+		if ekor_2%2 == 0 {
+			if nomorkeluaran == "EKOR_GENAP" {
+				flag = true
+			}
+		} else {
+			if nomorkeluaran == "EKOR_GANJIL" {
+				flag = true
+			}
+		}
+
+		if flag {
+			result = "WINNER"
+		}
+	case "50_50_KOMBINASI":
+		flag := false
+		data_1 := ""
+		data_2 := ""
+		data_3 := ""
+		data_4 := ""
+		depan := ""
+		tengah := ""
+		belakang := ""
+		depan_1 := ""
+		tengah_1 := ""
+		belakang_1 := ""
+		as := string([]byte(temp)[0])
+		kop := string([]byte(temp)[1])
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+
+		as_2, _ := strconv.Atoi(as)
+		kop_2, _ := strconv.Atoi(kop)
+		kepala_2, _ := strconv.Atoi(kepala)
+		ekor_2, _ := strconv.Atoi(ekor)
+
+		if as_2%2 == 0 {
+			data_1 = "GENAP"
+		} else {
+			data_1 = "GANJIL"
+		}
+		if kop_2%2 == 0 {
+			data_2 = "GENAP"
+		} else {
+			data_2 = "GANJIL"
+		}
+		if kepala_2%2 == 0 {
+			data_3 = "GENAP"
+		} else {
+			data_3 = "GANJIL"
+		}
+		if ekor_2%2 == 0 {
+			data_4 = "GENAP"
+		} else {
+			data_4 = "GANJIL"
+		}
+		depan = data_1 + "-" + data_2
+		tengah = data_2 + "-" + data_3
+		belakang = data_3 + "-" + data_4
+
+		if depan == "GENAP-GANJIL" || depan == "GANJIL-GENAP" {
+			depan = "DEPAN_STEREO"
+		} else {
+			depan = "DEPAN_MONO"
+		}
+		if tengah == "GENAP-GANJIL" || tengah == "GANJIL-GENAP" {
+			tengah = "TENGAH_STEREO"
+		} else {
+			tengah = "TENGAH_MONO"
+		}
+		if belakang == "GENAP-GANJIL" || belakang == "GANJIL-GENAP" {
+			belakang = "BELAKANG_STEREO"
+		} else {
+			belakang = "BELAKANG_MONO"
+		}
+		if as_2 < kop_2 {
+			depan_1 = "DEPAN_KEMBANG"
+		}
+		if as_2 > kop_2 {
+			depan_1 = "DEPAN_KEMPIS"
+		}
+		if as_2 == kop_2 {
+			depan_1 = "DEPAN_KEMBAR"
+		}
+		if kop_2 < kepala_2 {
+			tengah_1 = "TENGAH_KEMBANG"
+		}
+		if kop_2 > kepala_2 {
+			tengah_1 = "TENGAH_KEMPIS"
+		}
+		if kop_2 == kepala_2 {
+			tengah_1 = "TENGAH_KEMBAR"
+		}
+		if kepala_2 < ekor_2 {
+			belakang_1 = "BELAKANG_KEMBANG"
+		}
+		if kepala_2 > ekor_2 {
+			belakang_1 = "BELAKANG_KEMPIS"
+		}
+		if kepala_2 == ekor_2 {
+			belakang_1 = "BELAKANG_KEMBAR"
+		}
+
+		if depan == nomorkeluaran {
+			flag = true
+		}
+		if tengah == nomorkeluaran {
+			flag = true
+		}
+		if belakang == nomorkeluaran {
+			flag = true
+		}
+		if depan_1 == nomorkeluaran {
+			flag = true
+		}
+		if tengah_1 == nomorkeluaran {
+			flag = true
+		}
+		if belakang_1 == nomorkeluaran {
+			flag = true
+		}
+
+		if flag {
+			result = "WINNER"
+		}
+	case "MACAU_KOMBINASI":
+		flag := false
+		data_1 := ""
+		data_2 := ""
+		data_3 := ""
+		data_4 := ""
+		depan := ""
+		tengah := ""
+		tengah2 := ""
+		belakang := ""
+
+		as := string([]byte(temp)[0])
+		kop := string([]byte(temp)[1])
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+
+		as_2, _ := strconv.Atoi(as)
+		kop_2, _ := strconv.Atoi(kop)
+		kepala_2, _ := strconv.Atoi(kepala)
+		ekor_2, _ := strconv.Atoi(ekor)
+
+		if as_2 <= 4 {
+			data_1 = "KECIL"
+		} else {
+			data_1 = "BESAR"
+		}
+		if kop_2%2 == 0 {
+			data_2 = "GENAP"
+		} else {
+			data_2 = "GANJIL"
+		}
+		if kepala_2 <= 4 {
+			data_3 = "KECIL"
+		} else {
+			data_3 = "BESAR"
+		}
+		if ekor_2%2 == 0 {
+			data_4 = "GENAP"
+		} else {
+			data_4 = "GANJIL"
+		}
+
+		depan = "DEPAN_" + data_1 + "_" + data_2
+		tengah = "TENGAH_" + data_2 + "_" + data_3
+		tengah2 = "TENGAH_" + data_3 + "_" + data_2
+		belakang = "BELAKANG_" + data_3 + "_" + data_4
+
+		if depan == nomorkeluaran {
+			flag = true
+		}
+		if tengah == nomorkeluaran {
+			flag = true
+		}
+		if tengah2 == nomorkeluaran {
+			flag = true
+		}
+		if belakang == nomorkeluaran {
+			flag = true
+		}
+
+		if flag {
+			result = "WINNER"
+		}
+	case "DASAR":
+		flag := false
+		data_1 := ""
+		data_2 := ""
+
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+
+		kepala_2, _ := strconv.Atoi(kepala)
+		ekor_2, _ := strconv.Atoi(ekor)
+
+		dasar := kepala_2 + ekor_2
+
+		if dasar > 9 {
+			temp2 := strconv.Itoa(dasar) //int to string
+			temp21 := string([]byte(temp2)[0])
+			temp22 := string([]byte(temp2)[1])
+
+			temp21_2, _ := strconv.Atoi(temp21)
+			temp22_2, _ := strconv.Atoi(temp22)
+			dasar = temp21_2 + temp22_2
+		}
+		if dasar <= 4 {
+			data_1 = "KECIL"
+		} else {
+			data_1 = "BESAR"
+		}
+		if dasar%2 == 0 {
+			data_2 = "GENAP"
+		} else {
+			data_2 = "GANJIL"
+		}
+
+		if data_1 == nomorkeluaran {
+			flag = true
+		}
+		if data_2 == nomorkeluaran {
+			flag = true
+		}
+
+		if flag {
+			result = "WINNER"
+		}
+	case "SHIO":
+		flag := false
+
+		kepala := string([]byte(temp)[2])
+		ekor := string([]byte(temp)[3])
+		data := _tableshio(kepala + ekor)
+
+		if data == nomorkeluaran {
+			flag = true
+		}
+
+		if flag {
+			result = "WINNER"
+		}
+	}
+	return result, win
 }
