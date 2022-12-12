@@ -19,6 +19,7 @@ import (
 	"github.com/nikitamirzani323/togel_apibackend_consumer_saveperiode/models"
 	"github.com/nleeper/goment"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"golang.org/x/exp/slices"
 )
 
 type datajobs struct {
@@ -682,16 +683,11 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 					for b, _ := range temp4d {
 						for c, _ := range temp4d {
 							for d, _ := range temp4d {
-								if string([]byte(temp4d)[a]) != string([]byte(temp4d)[b]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[a]) != string([]byte(temp4d)[d]) {
-									if string([]byte(temp4d)[b]) != string([]byte(temp4d)[c]) && string([]byte(temp4d)[b]) != string([]byte(temp4d)[d]) {
-										if string([]byte(temp4d)[c]) != string([]byte(temp4d)[d]) {
-											temp_loop := string([]byte(temp4d)[a]) + string([]byte(temp4d)[b]) + string([]byte(temp4d)[c]) + string([]byte(temp4d)[d])
-											if temp4d != temp_loop {
-												temp4d_arr = append(temp4d_arr, temp_loop)
-											}
-										}
-									}
+								temp_loop := string([]byte(temp4d)[a]) + string([]byte(temp4d)[b]) + string([]byte(temp4d)[c]) + string([]byte(temp4d)[d])
+								if !slices.Contains(temp4d_arr, temp_loop) {
+									temp4d_arr = append(temp4d_arr, temp_loop)
 								}
+								temp_loop = ""
 							}
 						}
 					}
@@ -722,13 +718,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 					for b, _ := range temp3d {
 						for c, _ := range temp3d {
 							temp_loop := string([]byte(temp3d)[a]) + string([]byte(temp3d)[b]) + string([]byte(temp3d)[c])
-							if len(temp3d_arr) > 0 {
-								for x := 0; x < len(temp3d_arr); x++ {
-									if temp_loop != temp3d_arr[x] {
-										temp3d_arr = append(temp3d_arr, temp_loop)
-									}
-								}
-							} else {
+							if !slices.Contains(temp3d_arr, temp_loop) {
 								temp3d_arr = append(temp3d_arr, temp_loop)
 							}
 							temp_loop = ""
@@ -761,13 +751,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 					for b, _ := range temp3dd {
 						for c, _ := range temp3dd {
 							temp_loop := string([]byte(temp3dd)[a]) + string([]byte(temp3dd)[b]) + string([]byte(temp3dd)[c])
-							if len(temp3dd_arr) > 0 {
-								for x := 0; x < len(temp3dd_arr); x++ {
-									if temp_loop != temp3dd_arr[x] {
-										temp3dd_arr = append(temp3dd_arr, temp_loop)
-									}
-								}
-							} else {
+							if !slices.Contains(temp3dd_arr, temp_loop) {
 								temp3dd_arr = append(temp3dd_arr, temp_loop)
 							}
 							temp_loop = ""
@@ -799,13 +783,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 				for a, _ := range temp2d {
 					for b, _ := range temp2d {
 						temp_loop := string([]byte(temp2d)[a]) + string([]byte(temp2d)[b])
-						if len(temp2d_arr) > 0 {
-							for x := 0; x < len(temp2d_arr); x++ {
-								if temp_loop != temp2d_arr[x] {
-									temp2d_arr = append(temp2d_arr, temp_loop)
-								}
-							}
-						} else {
+						if !slices.Contains(temp2d_arr, temp_loop) {
 							temp2d_arr = append(temp2d_arr, temp_loop)
 						}
 						temp_loop = ""
@@ -836,13 +814,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 				for a, _ := range temp2dd {
 					for b, _ := range temp2dd {
 						temp_loop := string([]byte(temp2dd)[a]) + string([]byte(temp2dd)[b])
-						if len(temp2dd_arr) > 0 {
-							for x := 0; x < len(temp2dd_arr); x++ {
-								if temp_loop != temp2dd_arr[x] {
-									temp2dd_arr = append(temp2dd_arr, temp_loop)
-								}
-							}
-						} else {
+						if !slices.Contains(temp2dd_arr, temp_loop) {
 							temp2dd_arr = append(temp2dd_arr, temp_loop)
 						}
 						temp_loop = ""
@@ -873,13 +845,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 				for a, _ := range temp2dt {
 					for b, _ := range temp2dt {
 						temp_loop := string([]byte(temp2dt)[a]) + string([]byte(temp2dt)[b])
-						if len(temp2dt_arr) > 0 {
-							for x := 0; x < len(temp2dt_arr); x++ {
-								if temp_loop != temp2dt_arr[x] {
-									temp2dt_arr = append(temp2dt_arr, temp_loop)
-								}
-							}
-						} else {
+						if !slices.Contains(temp2dt_arr, temp_loop) {
 							temp2dt_arr = append(temp2dt_arr, temp_loop)
 						}
 						temp_loop = ""

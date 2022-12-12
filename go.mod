@@ -12,4 +12,5 @@ require (
 	github.com/nleeper/goment v1.4.4 // indirect
 	github.com/rabbitmq/amqp091-go v1.5.0 // indirect
 	github.com/tkuchiki/go-timezone v0.2.2 // indirect
+	golang.org/x/exp v0.0.0-20221211140036-ad323defaf05 // indirect
 )
