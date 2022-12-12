@@ -654,7 +654,7 @@ func _rumusTogel(angka, tipe, nomorkeluaran, posisitogel, company, simpandb stri
 	var result string = "LOSE"
 	var win float32 = 0
 
-	_, tbl_trx_keluarantogel_detail, _ := Get_mappingdatabase(company)
+	_, tbl_trx_keluarantogel_detail, _ := models.Get_mappingdatabase(company)
 
 	temp := angka
 	temp4d := string([]byte(temp)[0]) + string([]byte(temp)[1]) + string([]byte(temp)[2]) + string([]byte(temp)[3])
